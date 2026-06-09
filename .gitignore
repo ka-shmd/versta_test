@@ -1,2 +1,9 @@
 .env
 *.env.local
+
+.idea/
+
+bin/
+obj/
+
+appsettings.Development.json

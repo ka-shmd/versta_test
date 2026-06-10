@@ -1,3 +1,7 @@
 <Solution>
+  <Folder Name="/tests/">
+    <Project Path="tests/VerstaDelivery.IntegrationTests/VerstaDelivery.IntegrationTests.csproj" />
+    <Project Path="tests/VerstaDelivery.UnitTests/VerstaDelivery.UnitTests.csproj" />
+  </Folder>
   <Project Path="VerstaDelivery.Api/VerstaDelivery.Api.csproj" />
 </Solution>

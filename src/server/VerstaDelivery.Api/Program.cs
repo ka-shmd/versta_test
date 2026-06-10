@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
+using Scalar.AspNetCore;
 using Serilog;
 using VerstaDelivery.Api.Data;
 using VerstaDelivery.Api.Endpoints;
@@ -19,6 +20,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddSingleton<IOrderNumberGenerator, OrderNumberGenerator>();
 
+builder.Services.AddOpenApi();
+
 var app = builder.Build();
 
 app.UseSerilogRequestLogging();
@@ -34,5 +37,11 @@ app.MapHealthChecks("/health/ready", new HealthCheckOptions
 });
 
 app.MapOrderEndpoints();
+
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+    app.MapScalarApiReference();
+}
 
 app.Run();

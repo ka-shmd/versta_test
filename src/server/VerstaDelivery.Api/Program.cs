@@ -1,3 +1,4 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
@@ -5,6 +6,7 @@ using Serilog;
 using VerstaDelivery.Api.Data;
 using VerstaDelivery.Api.Endpoints;
 using VerstaDelivery.Api.Services;
+using VerstaDelivery.Api.Validation;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +25,8 @@ builder.Services.AddSingleton<IOrderNumberGenerator, OrderNumberGenerator>();
 builder.Services.AddOpenApi();
 
 builder.Services.AddProblemDetails();
+
+builder.Services.AddValidatorsFromAssemblyContaining<CreateOrderRequestValidator>();
 
 var app = builder.Build();
 

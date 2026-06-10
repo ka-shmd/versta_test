@@ -1,3 +1,4 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
@@ -21,9 +22,13 @@ public static class OrderEndpoints
         return builder;
     }
 
-    private static async Task<CreatedAtRoute<OrderDetails>> CreateOrder(CreateOrderRequest request, IOrderNumberGenerator numberGenerator,
-        AppDbContext context, ILoggerFactory loggerFactory, CancellationToken cancellationToken)
+    private static async Task<Results<CreatedAtRoute<OrderDetails>, ValidationProblem>> CreateOrder(CreateOrderRequest request, IOrderNumberGenerator numberGenerator,
+        AppDbContext context, ILoggerFactory loggerFactory, IValidator<CreateOrderRequest> validator, CancellationToken cancellationToken)
     {
+        var validation = await validator.ValidateAsync(request, cancellationToken);
+        if (!validation.IsValid)
+            return TypedResults.ValidationProblem(validation.ToDictionary());
+
         var order = new Order
         {
             SenderCity = request.SenderCity,

@@ -1,0 +1,79 @@
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
+using VerstaDelivery.Api.Data;
+using VerstaDelivery.Api.DTOs;
+using VerstaDelivery.Api.Models;
+using VerstaDelivery.Api.Services;
+
+namespace VerstaDelivery.Api.Endpoints;
+
+public static class OrderEndpoints
+{
+    public static IEndpointRouteBuilder MapOrderEndpoints(this IEndpointRouteBuilder builder)
+    {
+        var group = builder.MapGroup("/api/orders").WithTags("Orders");
+
+        group.MapPost("/", CreateOrder);
+        group.MapGet("/", GetOrders);
+        group.MapGet("/{orderNumber}", GetOrderByNumber).WithName("GetOrderByNumber");
+
+        return builder;
+    }
+
+    private static async Task<CreatedAtRoute<OrderDetails>> CreateOrder(CreateOrderRequest request, IOrderNumberGenerator numberGenerator,
+        AppDbContext context, ILoggerFactory loggerFactory, CancellationToken cancellationToken)
+    {
+        var order = new Order
+        {
+            OrderNumber = numberGenerator.Generate(),
+            SenderCity = request.SenderCity,
+            SenderAddress = request.SenderAddress,
+            RecipientCity = request.RecipientCity,
+            RecipientAddress = request.RecipientAddress,
+            Weight = request.Weight,
+            PickupDate = request.PickupDate,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        context.Orders.Add(order);
+        await context.SaveChangesAsync(cancellationToken);
+
+        var logger = loggerFactory.CreateLogger(nameof(OrderEndpoints));
+        logger.LogInformation("Order created: {OrderNumber}", order.OrderNumber);
+
+        return TypedResults.CreatedAtRoute(order.ToDetails(), "GetOrderByNumber",
+            new {orderNumber = order.OrderNumber});
+    }
+
+    private static async Task<Ok<PagedOrdersResponse>> GetOrders(AppDbContext context, CancellationToken cancellationToken,
+        int page = 1, int pageSize = 20)
+    {
+        page = Math.Max(1, page);
+        pageSize = Math.Clamp(pageSize, 1, 100);
+
+        var orders = await context.Orders
+            .OrderByDescending(o => o.CreatedAt)
+            .ThenByDescending(o => o.Id)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .Select(o => new OrderSummary(o.OrderNumber, o.SenderCity, o.SenderAddress, o.RecipientCity, o.RecipientAddress, o.Weight, o.PickupDate))
+            .ToArrayAsync(cancellationToken);
+
+        var count = await context.Orders.CountAsync(cancellationToken);
+
+        var response = new PagedOrdersResponse(orders, page, pageSize, (int) Math.Ceiling(count / (double) pageSize));
+
+        return TypedResults.Ok(response);
+    }
+
+    private static async Task<Results<Ok<OrderDetails>, NotFound>> GetOrderByNumber(string orderNumber,
+        AppDbContext context, CancellationToken cancellationToken)
+    {
+        var order = await context.Orders.AsNoTracking().SingleOrDefaultAsync(o => o.OrderNumber == orderNumber, cancellationToken);
+
+        if (order is null)
+            return TypedResults.NotFound();
+
+        return TypedResults.Ok(order.ToDetails());
+    }
+}

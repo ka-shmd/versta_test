@@ -11,8 +11,18 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Order>()
-            .HasIndex(o => o.OrderNumber)
-            .IsUnique();
+        modelBuilder.Entity<Order>(order =>
+        {
+            order.HasIndex(o => o.OrderNumber).IsUnique();
+
+            order.Property(o => o.OrderNumber).HasMaxLength(20);
+
+            order.Property(o => o.SenderCity).HasMaxLength(100);
+            order.Property(o => o.SenderAddress).HasMaxLength(255);
+            order.Property(o => o.RecipientCity).HasMaxLength(100);
+            order.Property(o => o.RecipientAddress).HasMaxLength(255);
+
+            order.Property(o => o.Weight).HasPrecision(10, 2);
+        });
     }
 }

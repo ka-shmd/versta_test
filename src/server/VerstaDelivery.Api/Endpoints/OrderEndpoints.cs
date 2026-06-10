@@ -1,5 +1,7 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using VerstaDelivery.Api.Data;
 using VerstaDelivery.Api.DTOs;
 using VerstaDelivery.Api.Models;
@@ -20,12 +22,15 @@ public static class OrderEndpoints
         return builder;
     }
 
-    private static async Task<CreatedAtRoute<OrderDetails>> CreateOrder(CreateOrderRequest request, IOrderNumberGenerator numberGenerator,
-        AppDbContext context, ILoggerFactory loggerFactory, CancellationToken cancellationToken)
+    private static async Task<Results<CreatedAtRoute<OrderDetails>, ValidationProblem>> CreateOrder(CreateOrderRequest request, IOrderNumberGenerator numberGenerator,
+        AppDbContext context, ILoggerFactory loggerFactory, IValidator<CreateOrderRequest> validator, CancellationToken cancellationToken)
     {
+        var validation = await validator.ValidateAsync(request, cancellationToken);
+        if (!validation.IsValid)
+            return TypedResults.ValidationProblem(validation.ToDictionary());
+
         var order = new Order
         {
-            OrderNumber = numberGenerator.Generate(),
             SenderCity = request.SenderCity,
             SenderAddress = request.SenderAddress,
             RecipientCity = request.RecipientCity,
@@ -35,8 +40,25 @@ public static class OrderEndpoints
             CreatedAt = DateTime.UtcNow
         };
 
-        context.Orders.Add(order);
-        await context.SaveChangesAsync(cancellationToken);
+        // На случай коллизии: делаем вторую попытку сгенерировать OrderNumber
+        for (int i = 0; i < 2; i++)
+        {
+            var orderNumber = numberGenerator.Generate();
+            order.OrderNumber = orderNumber;
+            context.Orders.Add(order);
+
+            try
+            {
+                await context.SaveChangesAsync(cancellationToken);
+                break;
+            }
+            catch (DbUpdateException ex)
+                when (ex.InnerException is PostgresException { SqlState: PostgresErrorCodes.UniqueViolation })
+            {
+                context.Entry(order).State = EntityState.Detached;
+                if (i == 1) throw;
+            }
+        }
 
         var logger = loggerFactory.CreateLogger(nameof(OrderEndpoints));
         logger.LogInformation("Order created: {OrderNumber}", order.OrderNumber);

@@ -22,7 +22,12 @@ builder.Services.AddSingleton<IOrderNumberGenerator, OrderNumberGenerator>();
 
 builder.Services.AddOpenApi();
 
+builder.Services.AddProblemDetails();
+
 var app = builder.Build();
+
+app.UseExceptionHandler();
+app.UseStatusCodePages();
 
 app.UseSerilogRequestLogging();
 
@@ -35,6 +40,7 @@ app.MapHealthChecks("/health/ready", new HealthCheckOptions
 {
     Predicate = check => check.Tags.Contains("ready")
 });
+
 
 app.MapOrderEndpoints();
 

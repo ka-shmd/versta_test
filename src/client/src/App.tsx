@@ -10,7 +10,7 @@ export function App() {
       <Route element={<AppLayout />}>
         <Route path="/" element={<CreateOrderPage />}/>
         <Route path="/orders" element={<OrdersListPage />}/>
-        <Route path="/orders/:orddderNumber" element={<OrderDetailPage />}/>
+        <Route path="/orders/:orderNumber" element={<OrderDetailPage />}/>
       </Route>
     </Routes>
   )

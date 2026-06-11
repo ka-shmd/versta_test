@@ -14,7 +14,7 @@ export function OrdersListPage() {
   const rawPage = Number(searchParams.get("page") ?? "1")
   const page = Number.isFinite(rawPage) ? rawPage : 1
 
-  const {data, isLoading, isError, error, refetch} = useQuery({
+  const {data, isLoading, isError, refetch} = useQuery({
     queryKey: ["orders", page],
     queryFn: () => getOrders(page)
   })

@@ -64,9 +64,6 @@ export function CreateOrderPage() {
     <div className="space-y-6">
       <h1 className="text-lg font-medium">Создание заказа</h1>
 
-      {showServerError &&
-        <Alert>Не удалось создать заказ</Alert>
-      }
 
       <form onSubmit={onSubmit} noValidate className="space-y-6">
         <FieldGroup>
@@ -77,6 +74,10 @@ export function CreateOrderPage() {
           <FormFieldWrapper name="weight" label="Вес" control={form.control} type="number" inputProps={{step: 0.1}} />
           <FormFieldWrapper name="pickupDate" label="Дата забора" control={form.control} type="date"/>
         </FieldGroup>
+
+        {showServerError &&
+          <Alert className="border-red-500 border-2 text-red-500">Не удалось создать заказ</Alert>
+        }
 
         <Button type="submit" disabled={mutation.isPending}>
           {mutation.isPending ? "Заказ создается" : "Создать заказ"}

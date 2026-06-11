@@ -11,3 +11,4 @@ obj/
 node_modules/
 dist/
 .env.local
+.vite/

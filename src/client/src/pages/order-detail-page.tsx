@@ -7,34 +7,34 @@ import {Button} from "@/components/ui/button.tsx";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.tsx";
 
 export function OrderDetailPage() {
-  const { orderNumber } = useParams<{ orderNumber: string }>()
+  const {orderNumber} = useParams<{ orderNumber: string }>()
+
+  const {data, isLoading, isError, error, refetch} = useQuery({
+    queryKey: ["order", orderNumber],
+    queryFn: () => getOrderByNumber(orderNumber!),
+    enabled: Boolean(orderNumber)
+  })
 
   if (!orderNumber) {
     return (
       <div>
         <h1>Некорректный номер заказа</h1>
-        <Link to="/orders">К списку</Link>
+        <Link to="/orders">К списку заказов</Link>
       </div>
     )
   }
-
-  const { data, isLoading, isError, error, refetch } = useQuery({
-    queryKey: ["order", orderNumber],
-    queryFn: () => getOrderByNumber(orderNumber),
-    enabled: Boolean(orderNumber)
-  })
 
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <Skeleton className="h-8 w-full" />
-        <Skeleton className="h-8 w-full" />
-        <Skeleton className="h-8 w-full" />
+        <Skeleton className="h-8 w-full"/>
+        <Skeleton className="h-8 w-full"/>
+        <Skeleton className="h-8 w-full"/>
       </div>
     )
   }
 
-  if (isError) {
+  if (isError || !data) {
     const isNotFound = error instanceof ApiError && error.status === 404
 
     return (
@@ -49,11 +49,10 @@ export function OrderDetailPage() {
         {!isNotFound && (
           <Button onClick={() => refetch()}>Повторить</Button>
         )}
+        <Link to="/orders" className="text-muted-foreground underline">К списку заказов</Link>
       </div>
     )
   }
-
-  if (!data) return
 
   return (
     <div className="space-y-4">
@@ -93,7 +92,7 @@ export function OrderDetailPage() {
           </div>
           <div className="flex justify-between">
             <div>Дата создания заказа</div>
-            <div>{data.createdAt.toString().slice(0, 10)}</div>
+            <div>{data.createdAt.slice(0, 10)}</div>
           </div>
         </CardContent>
       </Card>

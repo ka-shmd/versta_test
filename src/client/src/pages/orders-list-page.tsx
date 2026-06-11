@@ -4,7 +4,7 @@ import {Skeleton} from "@/components/ui/skeleton.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {Link, useNavigate, useSearchParams} from "react-router-dom";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
-import {useEffect} from "react";
+import {useCallback, useEffect} from "react";
 
 export function OrdersListPage() {
   const navigate = useNavigate()
@@ -19,7 +19,8 @@ export function OrdersListPage() {
     queryFn: () => getOrders(page)
   })
 
-  const isPageValid = () => {
+
+  const isPageValid = useCallback(() => {
     if (!data) return false
 
     if (page < 1) return false
@@ -27,16 +28,15 @@ export function OrdersListPage() {
     if (data.totalPages === 0) return false
 
     return true;
-  }
+  }, [data, page])
 
-  //редиректим на первую страницу, если в url невалидный параметр page
   useEffect(() => {
     const safePage = isPageValid() ? page : 1
 
     if (safePage != page) {
       setSearchParams({page: String(safePage)})
     }
-  }, [data, page, setSearchParams])
+  }, [data, page, isPageValid, setSearchParams])
 
   if (isLoading) {
     return (
@@ -59,7 +59,7 @@ export function OrdersListPage() {
     )
   }
 
-  if (!data || data.items.length === 0) {
+  if (!data || data.totalPages === 0) {
     return (
       <div className="space-y-4">
         <h1 className="text-lg font-medium">Список заказов</h1>

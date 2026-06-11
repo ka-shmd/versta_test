@@ -5,9 +5,6 @@ export function AppLayout() {
     <div className="min-h-svh">
       <header className="border-b">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
-          <span className="front-medium">
-            Тест Версты
-          </span>
           <nav className="flex gap-4 text-sm">
             <Link to="/">Новый заказ</Link>
             <Link to="/orders">Список заказов</Link>

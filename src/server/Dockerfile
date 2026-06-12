@@ -11,7 +11,10 @@ RUN dotnet publish VerstaDelivery.Api/VerstaDelivery.Api.csproj -c Release -o /a
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
 WORKDIR /app
 
-RUN adduser --disabled-password --gecos "" appuser
+RUN apt-get update  \
+    && apt-get install -y --no-install-recommends curl  \
+    && rm -rf /var/lib/apt/lists/*  \
+    && adduser --disabled-password --gecos "" appuser
 USER appuser
 
 COPY --from=build /app/publish .

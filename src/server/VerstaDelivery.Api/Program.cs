@@ -1,8 +1,11 @@
+using System.Diagnostics;
 using FluentValidation;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using Serilog;
+using Serilog.Context;
+using Serilog.Events;
 using VerstaDelivery.Api.Data;
 using VerstaDelivery.Api.Endpoints;
 using VerstaDelivery.Api.Services;
@@ -41,7 +44,36 @@ if (app.Configuration.GetValue<bool>("RunMigrations"))
 app.UseExceptionHandler();
 app.UseStatusCodePages();
 
-app.UseSerilogRequestLogging();
+app.Use(async (context, next) =>
+{
+    var traceId = Activity.Current?.Id ?? context.TraceIdentifier;
+
+    using (LogContext.PushProperty("TraceId", traceId))
+    {
+        await next();
+    }
+});
+
+app.UseSerilogRequestLogging(options =>
+{
+    options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
+    {
+        var traceId = Activity.Current?.Id ?? httpContext.TraceIdentifier;
+
+        diagnosticContext.Set("TraceId", traceId);
+    };
+
+    options.GetLevel = (httpContext, elapsed, ex) =>
+    {
+        if (httpContext.Request.Path.StartsWithSegments("/health")) return LogEventLevel.Debug;
+
+        if (ex is not null) return LogEventLevel.Error;
+        if (httpContext.Response.StatusCode >= 500) return LogEventLevel.Error;
+        if (httpContext.Response.StatusCode >= 400) return LogEventLevel.Warning;
+
+        return LogEventLevel.Information;
+    };
+});
 
 app.MapHealthChecks("/health", new HealthCheckOptions
 {

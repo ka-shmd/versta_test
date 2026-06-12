@@ -51,4 +51,46 @@ public class CreateOrderRequestValidatorTests
 
         Assert.All(expectedEmptyFieldErrors, errorProperty => Assert.Contains(errorProperty, errorProperties));
     }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    [InlineData(-0.01)]
+    public async Task CreateOrderValidation_WeightIsInvalid_ReturnsError(decimal weight)
+    {
+        var request = ValidRequest() with {Weight = weight};
+
+        var result = await _sut.ValidateAsync(request);
+
+        Assert.False(result.IsValid);
+        Assert.Contains(result.Errors, e => e.PropertyName == nameof(CreateOrderRequest.Weight));
+    }
+
+    [Fact]
+    public async Task CreateOrderValidation_PickupDateIsInvalid_ReturnsError()
+    {
+        var request = ValidRequest() with
+        {
+            PickupDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1))
+        };
+
+        var result = await _sut.ValidateAsync(request);
+
+        Assert.False(result.IsValid);
+        Assert.Contains(result.Errors, e => e.PropertyName == nameof(CreateOrderRequest.PickupDate));
+    }
+
+    [Fact]
+    public async Task CreateOrderValidation_SenderCityIsWhitespace_ReturnsSenderCityError()
+    {
+        var request = ValidRequest() with
+        {
+            SenderCity = " "
+        };
+
+        var result = await _sut.ValidateAsync(request);
+
+        Assert.False(result.IsValid);
+        Assert.Contains(result.Errors, e => e.PropertyName == nameof(CreateOrderRequest.SenderCity));
+    }
 }

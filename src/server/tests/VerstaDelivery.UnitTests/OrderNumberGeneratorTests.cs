@@ -1,10 +1,12 @@
+using Microsoft.Extensions.Time.Testing;
 using VerstaDelivery.Api.Services;
 
 namespace VerstaDelivery.UnitTests;
 
 public class OrderNumberGeneratorTests
 {
-    private readonly OrderNumberGenerator _sut = new();
+    private readonly OrderNumberGenerator _sut = new(
+        new FakeTimeProvider(new DateTimeOffset(2026, 6, 12, 12, 0, 0, TimeSpan.Zero)));
 
     [Fact]
     public void GenerateOrderNumber_CalledOnce_ReturnsCorrectFormat()
@@ -19,5 +21,13 @@ public class OrderNumberGeneratorTests
         var firstNumber = _sut.Generate();
         var secondNumber = _sut.Generate();
         Assert.NotEqual(firstNumber, secondNumber);
+    }
+
+    [Fact]
+    public void GenerateOrderNumber_Called_ReturnsCorrectFormat()
+    {
+        var number = _sut.Generate();
+
+        Assert.StartsWith("ORD-20260612", number);
     }
 }

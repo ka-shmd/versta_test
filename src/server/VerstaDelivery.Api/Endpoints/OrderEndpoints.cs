@@ -40,7 +40,8 @@ public static class OrderEndpoints
             CreatedAt = DateTime.UtcNow
         };
 
-        // На случай коллизии: делаем вторую попытку сгенерировать OrderNumber
+        var logger = loggerFactory.CreateLogger(nameof(OrderEndpoints));
+
         for (int i = 0; i < 2; i++)
         {
             var orderNumber = numberGenerator.Generate();
@@ -55,13 +56,18 @@ public static class OrderEndpoints
             catch (DbUpdateException ex)
                 when (ex.InnerException is PostgresException { SqlState: PostgresErrorCodes.UniqueViolation })
             {
+                logger.LogWarning("Коллизия номера заказа {OrderNumber} на попытке {Attempt}.", orderNumber, i + 1);
+
                 context.Entry(order).State = EntityState.Detached;
-                if (i == 1) throw;
+                if (i == 1)
+                {
+                    logger.LogError(ex, "Множественная коллизия номера заказа. Номер заказа {OrderNumber}", orderNumber);
+                    throw;
+                }
             }
         }
 
-        var logger = loggerFactory.CreateLogger(nameof(OrderEndpoints));
-        logger.LogInformation("Order created: {OrderNumber}", order.OrderNumber);
+        logger.LogInformation("Заказ создан. Номер заказа: {OrderNumber}", order.OrderNumber);
 
         return TypedResults.CreatedAtRoute(order.ToDetails(), "GetOrderByNumber",
             new {orderNumber = order.OrderNumber});

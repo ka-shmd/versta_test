@@ -31,6 +31,8 @@ export function OrdersListPage() {
   }, [data, page])
 
   useEffect(() => {
+    if (isLoading || !data) return
+
     const safePage = isPageValid() ? page : 1
 
     if (safePage != page) {

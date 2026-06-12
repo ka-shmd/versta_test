@@ -5,9 +5,16 @@ public class OrderNumberGenerator : IOrderNumberGenerator
     private const string Alphabet = "23456789ABCDEFGHJKMNPQRSTUVWXYZ";
     private const int SuffixLength = 6;
 
+    private readonly TimeProvider _timeProvider;
+
+    public OrderNumberGenerator(TimeProvider timeProvider)
+    {
+        _timeProvider = timeProvider;
+    }
+
     public string Generate()
     {
-        var date = DateOnly.FromDateTime(DateTime.UtcNow);
+        var date = DateOnly.FromDateTime(_timeProvider.GetUtcNow().UtcDateTime);
         var suffix = RandomSuffix();
         return $"ORD-{date:yyyyMMdd}-{suffix}";
     }

@@ -20,6 +20,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         .UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
         .UseSnakeCaseNamingConvention());
 
+builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddSingleton<IOrderNumberGenerator, OrderNumberGenerator>();
 
 builder.Services.AddOpenApi();
@@ -51,7 +52,6 @@ app.MapHealthChecks("/health/ready", new HealthCheckOptions
 {
     Predicate = check => check.Tags.Contains("ready")
 });
-
 
 app.MapOrderEndpoints();
 

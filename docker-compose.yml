@@ -18,6 +18,7 @@ services:
       retries: 3
 
   api:
+    container_name: api
     build:
       context: ./src/server
       dockerfile: Dockerfile
@@ -32,6 +33,7 @@ services:
         condition: service_healthy
 
   proxy:
+    container_name: proxy
     build:
       context: .
       dockerfile: docker/proxy.Dockerfile

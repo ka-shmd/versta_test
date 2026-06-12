@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VerstaDelivery.Api", "VerstaDelivery.Api\VerstaDelivery.Api.csproj", "{D15BCE47-6BEB-4531-A64E-E506C1726D10}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{955C51E1-7F6A-455C-B3F6-1F57C5AE0EDA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VerstaDelivery.UnitTests", "tests\VerstaDelivery.UnitTests\VerstaDelivery.UnitTests.csproj", "{1811ECD1-4078-4F13-B651-47C9E689BB3A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VerstaDelivery.IntegrationTests", "tests\VerstaDelivery.IntegrationTests\VerstaDelivery.IntegrationTests.csproj", "{55CF1F7A-E1C8-4FDA-AE36-D0B187D12B49}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D15BCE47-6BEB-4531-A64E-E506C1726D10}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D15BCE47-6BEB-4531-A64E-E506C1726D10}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D15BCE47-6BEB-4531-A64E-E506C1726D10}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D15BCE47-6BEB-4531-A64E-E506C1726D10}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1811ECD1-4078-4F13-B651-47C9E689BB3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1811ECD1-4078-4F13-B651-47C9E689BB3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1811ECD1-4078-4F13-B651-47C9E689BB3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1811ECD1-4078-4F13-B651-47C9E689BB3A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{55CF1F7A-E1C8-4FDA-AE36-D0B187D12B49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55CF1F7A-E1C8-4FDA-AE36-D0B187D12B49}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55CF1F7A-E1C8-4FDA-AE36-D0B187D12B49}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55CF1F7A-E1C8-4FDA-AE36-D0B187D12B49}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1811ECD1-4078-4F13-B651-47C9E689BB3A} = {955C51E1-7F6A-455C-B3F6-1F57C5AE0EDA}
+		{55CF1F7A-E1C8-4FDA-AE36-D0B187D12B49} = {955C51E1-7F6A-455C-B3F6-1F57C5AE0EDA}
+	EndGlobalSection
+EndGlobal

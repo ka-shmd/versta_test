@@ -6,7 +6,7 @@ import {
   type CreateOrderFormOutput,
   type CreateOrderFormValues,
   createOrderSchema
-} from "@/order-schema.ts";
+} from "@/schemas/order-schema.ts";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {createOrder} from "@/api/orders.ts";
 import {ValidationApiError} from "@/api/client.ts";

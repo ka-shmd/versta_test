@@ -1,4 +1,4 @@
-import type {CreateOrderFormInput, CreateOrderFormOutput, CreateOrderFormValues} from "@/order-schema.ts";
+import type {CreateOrderFormInput, CreateOrderFormOutput, CreateOrderFormValues} from "@/schemas/order-schema.ts";
 import {type Control, Controller} from "react-hook-form";
 import * as React from "react";
 import {Field, FieldError, FieldLabel} from "@/components/ui/field.tsx";

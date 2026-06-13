@@ -79,6 +79,8 @@ public static class OrderEndpoints
         page = Math.Max(1, page);
         pageSize = Math.Clamp(pageSize, 1, 100);
 
+        var count = await context.Orders.CountAsync(cancellationToken);
+
         var orders = await context.Orders
             .OrderByDescending(o => o.CreatedAt)
             .ThenByDescending(o => o.Id)
@@ -86,8 +88,6 @@ public static class OrderEndpoints
             .Take(pageSize)
             .Select(o => new OrderSummary(o.OrderNumber, o.SenderCity, o.SenderAddress, o.RecipientCity, o.RecipientAddress, o.Weight, o.PickupDate))
             .ToArrayAsync(cancellationToken);
-
-        var count = await context.Orders.CountAsync(cancellationToken);
 
         var response = new PagedOrdersResponse(orders, page, pageSize, (int) Math.Ceiling(count / (double) pageSize));
 

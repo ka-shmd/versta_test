@@ -78,9 +78,7 @@ export function OrdersListPage() {
         <TableHeader>
           <TableRow>
            <TableHead>Номер заказа</TableHead>
-           <TableHead>Город отправителя</TableHead>
            <TableHead>Адрес отправителя</TableHead>
-           <TableHead>Город получателя</TableHead>
            <TableHead>Адрес получателя</TableHead>
            <TableHead>Вес</TableHead>
            <TableHead>Дата забора</TableHead>
@@ -91,10 +89,8 @@ export function OrdersListPage() {
             <TableRow key={order.orderNumber} className="cursor-pointer"
                       onClick={() => navigate(`/orders/${order.orderNumber}`)}>
               <TableCell>{order.orderNumber}</TableCell>
-              <TableCell>{order.senderCity}</TableCell>
-              <TableCell>{order.senderAddress}</TableCell>
-              <TableCell>{order.recipientCity}</TableCell>
-              <TableCell>{order.recipientAddress}</TableCell>
+              <TableCell>{order.senderCity}, {order.senderAddress}</TableCell>
+              <TableCell>{order.recipientCity}, {order.recipientAddress}</TableCell>
               <TableCell>{order.weight}</TableCell>
               <TableCell>{order.pickupDate}</TableCell>
             </TableRow>
